@@ -1,7 +1,7 @@
 import { useState } from 'react'
 
 /**
- * Muestra /public/logo.png (el logo real del proyecto). Si todavia no fue
+ * Muestra /public/logo.jpg (el logo real del proyecto). Si todavia no fue
  * agregado ese archivo, cae en un mini logo dibujado a mano en SVG para que
  * la app nunca se vea rota mientras tanto.
  */
@@ -11,7 +11,7 @@ export default function Logo({ className = 'h-9 w-9' }) {
   if (!error) {
     return (
       <img
-        src="/logo.png"
+        src="/logo.jpg"
         alt="Somos Danza"
         className={className + ' object-contain'}
         onError={() => setError(true)}
