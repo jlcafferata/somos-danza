@@ -1,0 +1,16 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /escuelas/{id} {
+      allow read, write: if true;
+    }
+    match /puestas/{id} {
+      allow read, write: if true;
+    }
+    match /puntajes/{id} {
+      allow read: if true;
+      allow create: if true;
+      allow update, delete: if false; // los puntajes ya cargados no se pueden alterar
+    }
+  }
+}
