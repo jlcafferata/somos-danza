@@ -23,9 +23,6 @@ export default function Layout() {
             </div>
 
             <nav className="flex items-center gap-1 overflow-x-auto">
-              <NavLink to="/" className={({ isActive }) => `${linkBase} ${isActive ? linkActive : linkIdle}`}>
-                Jurado
-              </NavLink>
               <NavLink
                 to="/admin/datos"
                 className={({ isActive }) => `${linkBase} ${isActive ? linkActive : linkIdle}`}
