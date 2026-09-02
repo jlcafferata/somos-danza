@@ -1,11 +1,23 @@
 import { useMemo, useState } from 'react'
+import { useParams } from 'react-router-dom'
 import { useCollection } from '../hooks/useCollection'
 import { subscribeEscuelas } from '../services/escuelas'
 import { subscribePuestas } from '../services/puestas'
 import { subscribePuntajes } from '../services/puntajes'
+import { JURADOS } from '../services/puntajes'
 import PuestaScoreCard from '../components/PuestaScoreCard'
+import IntroSplash from '../components/IntroSplash'
 
+/**
+ * Pantalla del jurado. El numero de jurado viene fijo por la URL
+ * (/jurado/1 o /jurado/2), no se elige con un click: cada jurado entra con
+ * su propio link y todo lo que carga queda asociado a ese numero.
+ */
 export default function JuradoPage() {
+  const { numero } = useParams()
+  const jurado = Number(numero)
+  const juradoValido = JURADOS.includes(jurado)
+
   const { data: escuelas } = useCollection(subscribeEscuelas)
   const { data: puestas, loading } = useCollection(subscribePuestas)
   const { data: puntajes } = useCollection(subscribePuntajes)
@@ -26,13 +38,27 @@ export default function JuradoPage() {
       (!disciplina || p.disciplina === disciplina)
   )
 
+  if (!juradoValido) {
+    return (
+      <div className="max-w-md mx-auto mt-10 text-center bg-white rounded-2xl border border-brand-100 shadow-sm p-6">
+        <h1 className="text-xl font-bold text-brand-900 mb-2">Link invalido</h1>
+        <p className="text-brand-900/60 text-sm">
+          Este link de jurado no es valido. Pedile al organizador el link correcto.
+        </p>
+      </div>
+    )
+  }
+
   return (
     <div className="flex flex-col gap-5">
+      <IntroSplash />
+
       <div>
+        <span className="inline-block text-xs font-bold uppercase tracking-wide bg-brand-600 text-white px-3 py-1 rounded-full mb-2">
+          Jurado {jurado}
+        </span>
         <h1 className="text-2xl font-extrabold text-brand-900">Cargar puntaje</h1>
-        <p className="text-brand-900/60 text-sm mt-1">
-          Elegi la puesta en escena y cargá el puntaje como Jurado 1 o Jurado 2.
-        </p>
+        <p className="text-brand-900/60 text-sm mt-1">Elegi la puesta en escena y cargá tu puntaje.</p>
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 bg-white rounded-2xl border border-brand-100 shadow-sm p-4">
@@ -96,7 +122,8 @@ export default function JuradoPage() {
             key={puesta.id}
             puesta={puesta}
             escuelaNombre={escuelaPorId[puesta.escuelaId] || 'Escuela desconocida'}
-            puntajesDePuesta={puntajes.filter((p) => p.puestaId === puesta.id)}
+            jurado={jurado}
+            puntajeExistente={puntajes.find((p) => p.puestaId === puesta.id && p.jurado === jurado)}
           />
         ))}
       </div>

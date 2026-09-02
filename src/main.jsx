@@ -6,6 +6,7 @@ import './index.css'
 import { AdminAuthProvider } from './context/AdminAuthContext'
 import Layout from './components/Layout'
 import ProtectedAdminRoute from './components/ProtectedAdminRoute'
+import JuradoHomePage from './pages/JuradoHomePage'
 import JuradoPage from './pages/JuradoPage'
 import AdminLoginPage from './pages/AdminLoginPage'
 import AdminDatosPage from './pages/AdminDatosPage'
@@ -17,7 +18,8 @@ createRoot(document.getElementById('root')).render(
       <BrowserRouter>
         <Routes>
           <Route element={<Layout />}>
-            <Route index element={<JuradoPage />} />
+            <Route index element={<JuradoHomePage />} />
+            <Route path="jurado/:numero" element={<JuradoPage />} />
             <Route path="admin/login" element={<AdminLoginPage />} />
             <Route
               path="admin/datos"
