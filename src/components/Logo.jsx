@@ -12,7 +12,7 @@ export default function Logo({ className = 'h-9 w-9' }) {
     return (
       <img
         src="/logo.jpg"
-        alt="Somos Danza"
+        alt="Somos DaNNza"
         className={className + ' object-contain'}
         onError={() => setError(true)}
       />

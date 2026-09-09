@@ -12,7 +12,7 @@ export default function JuradoHomePage() {
     <div className="min-h-[70vh] flex flex-col items-center justify-center gap-6 px-4 text-center">
       <Logo className="h-20 w-20" />
       <div>
-        <h1 className="text-2xl font-extrabold text-brand-900">Somos Danza</h1>
+        <h1 className="text-2xl font-extrabold text-brand-900">Somos DaNNza</h1>
         <p className="text-brand-900/60 text-sm mt-1">Entra con el link que te compartio el organizador.</p>
       </div>
       <div className="flex gap-3">

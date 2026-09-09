@@ -19,7 +19,7 @@ export default function Layout() {
           <div className="max-w-5xl mx-auto px-4 py-3 flex items-center justify-between gap-3">
             <div className="flex items-center gap-2 text-brand-700">
               <Logo />
-              <span className="font-display font-extrabold text-lg tracking-tight">Somos Danza</span>
+              <span className="font-display font-extrabold text-lg tracking-tight">Somos DaNNza</span>
             </div>
 
             <nav className="flex items-center gap-1 overflow-x-auto">
@@ -44,7 +44,7 @@ export default function Layout() {
         <Outlet />
       </main>
 
-      {!esVistaJurado && <footer className="text-center text-xs text-brand-900/50 py-4">Somos Danza</footer>}
+      {!esVistaJurado && <footer className="text-center text-xs text-brand-900/50 py-4">Somos DaNNza</footer>}
 
       <span className="fixed bottom-2 right-3 text-[10px] text-brand-900/40 z-40 pointer-events-none">
         creado por JLC - Desarrollos inteligentes
