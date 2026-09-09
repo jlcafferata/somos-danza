@@ -32,25 +32,32 @@ export function subscribePuestas(onData, onError) {
   return onSnapshot(q, (snap) => onData(snap.docs.map((d) => ({ id: d.id, ...d.data() }))), onError)
 }
 
-export function crearPuesta({ escuelaId, nombre, categoria, disciplina, cantidadAlumnos, docentes }) {
+export function crearPuesta({ escuelaId, nombre, funcion, categoria, disciplina, cantidadAlumnos, docentes, orden }) {
   return addDoc(puestasRef, {
     escuelaId,
     nombre: nombre.trim(),
+    funcion: funcion.trim(),
     categoria: categoria.trim(),
     disciplina: disciplina.trim(),
     cantidadAlumnos: Number(cantidadAlumnos) || 0,
     docentes: docentes.trim(),
+    orden: Number(orden) || 0,
   })
 }
 
-export function actualizarPuesta(id, { escuelaId, nombre, categoria, disciplina, cantidadAlumnos, docentes }) {
+export function actualizarPuesta(
+  id,
+  { escuelaId, nombre, funcion, categoria, disciplina, cantidadAlumnos, docentes, orden }
+) {
   return updateDoc(doc(db, 'puestas', id), {
     escuelaId,
     nombre: nombre.trim(),
+    funcion: funcion.trim(),
     categoria: categoria.trim(),
     disciplina: disciplina.trim(),
     cantidadAlumnos: Number(cantidadAlumnos) || 0,
     docentes: docentes.trim(),
+    orden: Number(orden) || 0,
   })
 }
 

@@ -9,8 +9,8 @@ service cloud.firestore {
     }
     match /puntajes/{id} {
       allow read: if true;
-      allow create: if true;
-      allow update, delete: if false; // los puntajes ya cargados no se pueden alterar
+      allow create, update: if true; // el jurado puede corregir un puntaje ya enviado
+      allow delete: if false;
     }
   }
 }

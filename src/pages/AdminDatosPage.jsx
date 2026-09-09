@@ -13,10 +13,12 @@ import {
 const puestaVacia = {
   escuelaId: '',
   nombre: '',
+  funcion: '',
   categoria: '',
   disciplina: '',
   cantidadAlumnos: '',
   docentes: '',
+  orden: '',
 }
 
 export default function AdminDatosPage() {
@@ -138,10 +140,14 @@ function PuestasSection({ escuelas, puestas }) {
   const [editId, setEditId] = useState(null)
   const [saving, setSaving] = useState(false)
   const [filtroEscuela, setFiltroEscuela] = useState('')
+  const [filtroFuncion, setFiltroFuncion] = useState('')
 
   const escuelaPorId = useMemo(() => Object.fromEntries(escuelas.map((e) => [e.id, e.nombre])), [escuelas])
+  const funciones = useMemo(() => [...new Set(puestas.map((p) => p.funcion).filter(Boolean))].sort(), [puestas])
 
-  const puestasVisibles = filtroEscuela ? puestas.filter((p) => p.escuelaId === filtroEscuela) : puestas
+  const puestasVisibles = puestas.filter(
+    (p) => (!filtroEscuela || p.escuelaId === filtroEscuela) && (!filtroFuncion || p.funcion === filtroFuncion)
+  )
 
   function setField(field, value) {
     setForm((f) => ({ ...f, [field]: value }))
@@ -152,10 +158,12 @@ function PuestasSection({ escuelas, puestas }) {
     setForm({
       escuelaId: puesta.escuelaId,
       nombre: puesta.nombre,
+      funcion: puesta.funcion || '',
       categoria: puesta.categoria,
       disciplina: puesta.disciplina,
       cantidadAlumnos: puesta.cantidadAlumnos,
       docentes: puesta.docentes,
+      orden: puesta.orden || '',
     })
   }
 
@@ -166,15 +174,19 @@ function PuestasSection({ escuelas, puestas }) {
 
   async function handleSubmit(e) {
     e.preventDefault()
-    if (!form.escuelaId || !form.nombre.trim()) return
+    if (!form.escuelaId || !form.nombre.trim() || !form.funcion.trim()) return
     setSaving(true)
     try {
       if (editId) {
         await actualizarPuesta(editId, form)
+        cancelEdit()
       } else {
         await crearPuesta(form)
+        // Mantiene la Funcion preseleccionada: al cargar varias puestas
+        // seguidas de la misma funcion, no hay que volver a elegirla.
+        setForm({ ...puestaVacia, funcion: form.funcion })
+        setEditId(null)
       }
-      cancelEdit()
     } finally {
       setSaving(false)
     }
@@ -190,6 +202,22 @@ function PuestasSection({ escuelas, puestas }) {
       <h2 className="text-lg font-bold text-brand-800 mb-3">Puestas en escena</h2>
 
       <form onSubmit={handleSubmit} className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 mb-5">
+        <label className="text-sm font-medium text-brand-900">
+          Funcion
+          <input
+            value={form.funcion}
+            onChange={(e) => setField('funcion', e.target.value)}
+            list="funciones-sugeridas"
+            required
+            className="mt-1 w-full rounded-lg border border-brand-200 px-3 py-2"
+          />
+          <datalist id="funciones-sugeridas">
+            {funciones.map((f) => (
+              <option key={f} value={f} />
+            ))}
+          </datalist>
+        </label>
+
         <label className="text-sm font-medium text-brand-900">
           Escuela
           <select
@@ -270,6 +298,18 @@ function PuestasSection({ escuelas, puestas }) {
           />
         </label>
 
+        <label className="text-sm font-medium text-brand-900">
+          Orden de exhibicion
+          <input
+            type="number"
+            min="0"
+            value={form.orden}
+            onChange={(e) => setField('orden', e.target.value)}
+            placeholder="1, 2, 3..."
+            className="mt-1 w-full rounded-lg border border-brand-200 px-3 py-2"
+          />
+        </label>
+
         <div className="sm:col-span-2 lg:col-span-3 flex gap-2">
           <button
             type="submit"
@@ -290,7 +330,23 @@ function PuestasSection({ escuelas, puestas }) {
         </div>
       </form>
 
-      <div className="flex items-center gap-2 mb-2">
+      <div className="flex flex-wrap items-center gap-4 mb-2">
+        <label className="text-sm font-medium text-brand-900">
+          Filtrar por funcion
+          <select
+            value={filtroFuncion}
+            onChange={(e) => setFiltroFuncion(e.target.value)}
+            className="ml-2 rounded-lg border border-brand-200 px-2 py-1"
+          >
+            <option value="">Todas</option>
+            {funciones.map((f) => (
+              <option key={f} value={f}>
+                {f}
+              </option>
+            ))}
+          </select>
+        </label>
+
         <label className="text-sm font-medium text-brand-900">
           Filtrar por escuela
           <select
@@ -312,6 +368,8 @@ function PuestasSection({ escuelas, puestas }) {
         <table className="w-full text-sm">
           <thead>
             <tr className="text-left text-brand-900/60 border-b border-brand-100">
+              <th className="py-2 pr-3">Orden</th>
+              <th className="py-2 pr-3">Funcion</th>
               <th className="py-2 pr-3">Escuela</th>
               <th className="py-2 pr-3">Puesta</th>
               <th className="py-2 pr-3">Categoria</th>
@@ -324,6 +382,8 @@ function PuestasSection({ escuelas, puestas }) {
           <tbody className="divide-y divide-brand-50">
             {puestasVisibles.map((p) => (
               <tr key={p.id}>
+                <td className="py-2 pr-3">{p.orden || '-'}</td>
+                <td className="py-2 pr-3 whitespace-nowrap">{p.funcion || '-'}</td>
                 <td className="py-2 pr-3 whitespace-nowrap">{escuelaPorId[p.escuelaId] || '-'}</td>
                 <td className="py-2 pr-3">{p.nombre}</td>
                 <td className="py-2 pr-3">{p.categoria}</td>
@@ -342,7 +402,7 @@ function PuestasSection({ escuelas, puestas }) {
             ))}
             {puestasVisibles.length === 0 && (
               <tr>
-                <td colSpan={7} className="py-3 text-brand-900/50">
+                <td colSpan={9} className="py-3 text-brand-900/50">
                   Todavia no hay puestas cargadas.
                 </td>
               </tr>

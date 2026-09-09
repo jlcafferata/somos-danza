@@ -32,8 +32,10 @@ Abre `http://localhost:5173`.
 | Coleccion  | Campos |
 |---|---|
 | `escuelas` | `nombre` |
-| `puestas`  | `escuelaId`, `nombre`, `categoria`, `disciplina`, `cantidadAlumnos`, `docentes` |
-| `puntajes` | `puestaId`, `jurado` (1 o 2), `valor`, `comentario`, `createdAt` |
+| `puestas`  | `escuelaId`, `nombre`, `funcion`, `categoria`, `disciplina`, `cantidadAlumnos`, `docentes`, `orden` |
+| `puntajes` | `puestaId`, `jurado` (1 o 2), `valor`, `comentario`, `createdAt`, `updatedAt` |
+
+En `puntajes`, el id del documento es `{puestaId}_j{jurado}` (no autogenerado): si un jurado corrige un puntaje ya enviado, se sobreescribe el mismo registro en vez de crear uno nuevo.
 
 ### Reglas de seguridad de Firestore
 
@@ -47,8 +49,8 @@ service cloud.firestore {
     match /puestas/{id}  { allow read, write: if true; }
     match /puntajes/{id} {
       allow read: if true;
-      allow create: if true;
-      allow update, delete: if false; // los puntajes ya cargados no se pueden alterar
+      allow create, update: if true; // el jurado puede corregir un puntaje ya enviado
+      allow delete: if false;
     }
   }
 }

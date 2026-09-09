@@ -22,21 +22,28 @@ export default function JuradoPage() {
   const { data: puestas, loading } = useCollection(subscribePuestas)
   const { data: puntajes } = useCollection(subscribePuntajes)
 
+  const [funcion, setFuncion] = useState('')
   const [escuelaId, setEscuelaId] = useState('')
   const [categoria, setCategoria] = useState('')
   const [disciplina, setDisciplina] = useState('')
 
   const escuelaPorId = useMemo(() => Object.fromEntries(escuelas.map((e) => [e.id, e.nombre])), [escuelas])
 
+  const funciones = useMemo(() => [...new Set(puestas.map((p) => p.funcion).filter(Boolean))].sort(), [puestas])
   const categorias = useMemo(() => [...new Set(puestas.map((p) => p.categoria).filter(Boolean))].sort(), [puestas])
   const disciplinas = useMemo(() => [...new Set(puestas.map((p) => p.disciplina).filter(Boolean))].sort(), [puestas])
 
-  const puestasFiltradas = puestas.filter(
-    (p) =>
-      (!escuelaId || p.escuelaId === escuelaId) &&
-      (!categoria || p.categoria === categoria) &&
-      (!disciplina || p.disciplina === disciplina)
-  )
+  const puestasFiltradas = puestas
+    .filter(
+      (p) =>
+        (!funcion || p.funcion === funcion) &&
+        (!escuelaId || p.escuelaId === escuelaId) &&
+        (!categoria || p.categoria === categoria) &&
+        (!disciplina || p.disciplina === disciplina)
+    )
+    // Orden manual definido por el admin (campo "Orden" de la puesta); a
+    // igual orden, alfabetico por nombre.
+    .sort((a, b) => (Number(a.orden) || 0) - (Number(b.orden) || 0) || a.nombre.localeCompare(b.nombre))
 
   if (!juradoValido) {
     return (
@@ -61,7 +68,23 @@ export default function JuradoPage() {
         <p className="text-brand-900/60 text-sm mt-1">Elegi la puesta en escena y cargá tu puntaje.</p>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 bg-white rounded-2xl border border-brand-100 shadow-sm p-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 bg-white rounded-2xl border border-brand-100 shadow-sm p-4">
+        <label className="text-sm font-medium text-brand-900">
+          Funcion
+          <select
+            value={funcion}
+            onChange={(e) => setFuncion(e.target.value)}
+            className="mt-1 w-full rounded-lg border border-brand-200 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-brand-400"
+          >
+            <option value="">Todas</option>
+            {funciones.map((f) => (
+              <option key={f} value={f}>
+                {f}
+              </option>
+            ))}
+          </select>
+        </label>
+
         <label className="text-sm font-medium text-brand-900">
           Escuela
           <select
